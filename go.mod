@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/wailsapp/wails/v2 v2.1.0
 )
 

@@ -10,10 +10,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"sort"
 	"time"
+
+	"github.com/skratchdot/open-golang/open"
 
 	fileutil "wails-fm/core"
 
@@ -97,7 +97,7 @@ func imgIsSupported(extension string) bool {
 }
 
 func (a *App) OpenWithDefaultApp(path string) {
-	exec.Command("xdg-open", path)
+	open.Run(path)
 }
 
 func (a *App) FormatDate(date time.Time, format string) string {
@@ -154,12 +154,6 @@ func (a *App) GetFolderAPI(path string) FolderData {
 			})
 		}
 	}
-	sort.Slice(FolderList, func(i, j int) bool {
-		return FolderList[i].Name < FolderList[j].Name
-	})
-	sort.Slice(FileList, func(i, j int) bool {
-		return FileList[i].Name < FileList[j].Name
-	})
 	return FolderData{FileList, FolderList}
 }
 
