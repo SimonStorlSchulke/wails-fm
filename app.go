@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"context"
 	b64 "encoding/base64"
-	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sort"
+	"time"
+
+	fileutil "wails-fm/core"
 
 	"github.com/nfnt/resize"
 )
@@ -34,16 +38,6 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
-}
-
-// Greet returns a greeting for the given name
-func (a *App) GreetJohn(name string) string {
-	return "Hello John It's show time!"
 }
 
 func (a *App) GetLocalFile(requestedFilename string) string {
@@ -102,41 +96,71 @@ func imgIsSupported(extension string) bool {
 	}
 }
 
-func (a *App) GetFolderFilepaths(path string) string {
+func (a *App) OpenWithDefaultApp(path string) {
+	exec.Command("xdg-open", path)
+}
 
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		return "<div class='filearea'></div>"
-	}
-	strDirs := "<div class='folderarea'>"
-	strFiles := "<div class='filearea'>"
+func (a *App) FormatDate(date time.Time, format string) string {
+	return date.Format(format)
+}
+
+type Filestruct struct {
+	FullPath  string
+	Name      string
+	Size      int64
+	ModDate   time.Time
+	Extension string
+	Hidden    bool
+}
+
+type Folderstruct struct {
+	FullPath string
+	Name     string
+	Size     int64
+	ModDate  time.Time
+	Hidden   bool
+}
+
+type FolderData struct {
+	Files   []Filestruct
+	Folders []Folderstruct
+}
+
+func (a *App) GetFolderAPI(path string) FolderData {
+	files, _ := ioutil.ReadDir(path)
+
+	var FileList []Filestruct
+	var FolderList []Folderstruct
 	for _, file := range files {
 		filename := file.Name()
-		filesize := file.Size()
-		moddate := file.ModTime()
-		extension := filepath.Ext(filename)
+		hidden, _ := fileutil.FileIsHidden(path + "/" + filename)
 
 		if file.IsDir() {
-			strDirs += fmt.Sprintf(`
-			<div class='file-card dir onclick="enterFolder()"'>
-				<p class="filename">%s</p>
-				<p class="modified">%v</p>
-			</div>`,
-				filename, moddate.Format("2006-01-02"))
+			FileList = append(FileList, Filestruct{
+				FullPath:  path + "/" + filename,
+				Name:      filename,
+				Size:      file.Size(),
+				ModDate:   file.ModTime(),
+				Extension: filepath.Ext(filename),
+				Hidden:    hidden,
+			})
 		} else {
-			strFiles += fmt.Sprintf(`
-					<div class='file-card ext-%s'>
-						<p class="filename">%s</p>
-						<p class="filesize">%v</p>
-						<p class="modified">%v</p>
-					</div>`,
-				RemoveFirstChar(extension), filename, filesize, moddate.Format("2006-01-02"))
+			FolderList = append(FolderList, Folderstruct{
+				FullPath: path + "/" + filename,
+				Name:     filename,
+				Size:     file.Size(),
+				ModDate:  file.ModTime(),
+				Hidden:   hidden,
+			})
 		}
-
 	}
-	strDirs += "</div>"
-	strFiles += "</div>"
-	return strDirs + strFiles
+	sort.Slice(FolderList, func(i, j int) bool {
+		return FolderList[i].Name < FolderList[j].Name
+	})
+	sort.Slice(FileList, func(i, j int) bool {
+		return FileList[i].Name < FileList[j].Name
+	})
+	return FolderData{FileList, FolderList}
 }
 
 func (a *App) GetThumbnailAsBase64(requestedFilename string) string {

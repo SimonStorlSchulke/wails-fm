@@ -1,7 +1,9 @@
 <script lang="ts">
+  import FileVIew from "./FileVIew.svelte"
   import logo from './assets/images/logo-universal.png'
-  import {GetFolderFilepaths, GreetJohn, GetLocalFile, GetThumbnailAsBase64} from '../wailsjs/go/main/App.js'
+  import {GetFolderAPI, GetLocalFile, GetThumbnailAsBase64, OpenWithDefaultApp} from '../wailsjs/go/main/App.js'
   import {WindowFullscreen} from '../wailsjs/runtime/runtime.js'
+
 
   let resultText: string = "Please enter your name below 👇"
   let name: string = "C:/Users/simon/"
@@ -12,6 +14,21 @@
     return doc.body;
   };
 
+  let showhiddenFiles: boolean = false;
+  function updateHiddenFiled() {
+    let hiddenFiles = document.querySelectorAll(".file-hidden")
+    if (!showhiddenFiles) {
+      hiddenFiles.forEach(filecard => {
+        (filecard as HTMLElement).classList.add("hidden");
+      });
+    } else {
+      hiddenFiles.forEach(filecard => {
+        (filecard as HTMLElement).classList.remove("hidden");
+      });
+    }
+  }
+
+
   function sanitizePath(path: string): string {
     path = path.replace(/([^:]\/)\/+/g, "$1");
     path = path.replaceAll("\\", "/");
@@ -21,49 +38,83 @@
     return path;
   }
 
-  function intoFolder() {
-    console.log("up")
-  }
-
-  function submitPath(moveUp: boolean): void {
-    document.querySelector(".file-area").innerHTML = "";
+  function submitPathOld(moveUp: boolean): void {
+    //document.querySelector(".file-area").innerHTML = "";
     name = sanitizePath(name)
     if (moveUp) {
       let els: string[] = name.split("/")
       let num: number = els[els.length - 2].length + 1
-      console.log(num)
       name = name.slice(0, name.length - num)
     }
-    GetFolderFilepaths(name).then(fi => {
-      document.querySelector(".file-area").append(stringToHTML(fi))
+    /*GetFolderFilepaths(name).then(fi => {
+      //document.querySelector(".file-area").append(stringToHTML(fi))
       document.querySelectorAll(".dir").forEach(dir => {
         dir.addEventListener("click", function() {
           let o: string = dir.querySelector("p").innerText
-          name = name + "/" + o
-          submitPath(false)
+          name += o
+          submitPathOld(false)
         })
       })
-    })
-
-    
+      updateHiddenFiled()
+    })*/
 
     //GetThumbnailAsBase64(name).then(res => document.querySelector<HTMLImageElement>("#logo").src = "data:image/png;base64," + res)
   }
+  let folderData;
+  function submitPath(moveUp: boolean): void {
+    name = sanitizePath(name)
+    if (moveUp) {
+      let els: string[] = name.split("/")
+      let num: number = els[els.length - 2].length + 1
+      name = name.slice(0, name.length - num)
+    }
+    GetFolderAPI(name).then(fi => {
+      folderData = fi;
+      console.log(fi.Files)
+    })
+  }
 
+  function folderDoubleclicked(foldername) {
+    name = sanitizePath(name)
+    name += foldername.detail.foldername
+    submitPath(false)
+    }
 
-  resultText = "Testing"
-
+  window.onload = function() {submitPath(false)}
 </script>
 
 <main>
   <!--<img alt="Wails logo" id="logo" src="">-->
   <div class="input-box" id="input">
+    <input type=checkbox bind:checked={showhiddenFiles} on:change={updateHiddenFiled} id="cb-hiddenfiles"> <label for="cb-hiddenfiles">Show Hidden Files</label>
     <button class="btn" on:click={() => submitPath(true)}>^</button>
     <input autocomplete="off" bind:value={name} class="input" id="name" type="text"/>
     <button class="btn" on:click={() => submitPath(false)}>-></button>
   </div>
   <div class="flex-container">
-    <div class="file-area"></div>
+    <div class="file-area">
+      {#key folderData}
+      <section>
+        {#if folderData}
+          {#if folderData.Files}
+            {#each folderData.Files as fileinfo }
+            <FileVIew on:message={folderDoubleclicked} fileinfo={fileinfo} isDir={true}/>
+          {/each}
+          {/if}
+        {/if}
+      </section>
+
+      <section>
+        {#if folderData}
+        {#if folderData.Folders}
+          {#each folderData.Folders as folderinfo }
+          <FileVIew fileinfo={folderinfo} isDir={false}/>
+        {/each}
+        {/if}
+        {/if}
+      </section>
+      {/key}
+    </div>
     <div class="inspector">Inspector</div>
   </div>
 </main>

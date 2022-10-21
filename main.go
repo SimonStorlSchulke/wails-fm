@@ -40,7 +40,7 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:            "wailstest",
-		Width:            1024,
+		Width:            1290,
 		Height:           768,
 		Assets:           assets,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
