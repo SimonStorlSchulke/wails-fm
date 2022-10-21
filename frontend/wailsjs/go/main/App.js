@@ -6,8 +6,16 @@ export function FormatDate(arg1, arg2) {
   return window['go']['main']['App']['FormatDate'](arg1, arg2);
 }
 
+export function GetFileDetailsSingle(arg1) {
+  return window['go']['main']['App']['GetFileDetailsSingle'](arg1);
+}
+
 export function GetFolderAPI(arg1) {
   return window['go']['main']['App']['GetFolderAPI'](arg1);
+}
+
+export function GetHomeDir() {
+  return window['go']['main']['App']['GetHomeDir']();
 }
 
 export function GetLocalFile(arg1) {

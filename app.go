@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/skratchdot/open-golang/open"
+	"github.com/wailsapp/mimetype"
 
 	fileutil "wails-fm/core"
 
@@ -32,6 +33,12 @@ type FileLoader struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
+}
+
+func (a *App) GetHomeDir() string {
+	path, _ := os.UserHomeDir()
+	println(path)
+	return path
 }
 
 // startup is called when the app starts. The context is saved
@@ -110,6 +117,7 @@ type Filestruct struct {
 	Size      int64
 	ModDate   time.Time
 	Extension string
+	MimeType  string
 	Hidden    bool
 }
 
@@ -119,11 +127,39 @@ type Folderstruct struct {
 	Size     int64
 	ModDate  time.Time
 	Hidden   bool
+	IsLink   bool
 }
 
 type FolderData struct {
 	Files   []Filestruct
 	Folders []Folderstruct
+}
+
+type Tab struct {
+	Address        string
+	AddressHistory []string
+	SelectedFiles  []string
+}
+
+type AppState struct {
+	Tabs       []Tab
+	currentTab Tab
+}
+
+type FileDetailsSingle struct {
+	MimeType string
+}
+
+func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
+	mType := "unknown"
+	mimetype, err := mimetype.DetectFile(path)
+	if err == nil {
+		mType = mimetype.String()
+	}
+
+	return FileDetailsSingle{
+		MimeType: mType,
+	}
 }
 
 func (a *App) GetFolderAPI(path string) FolderData {
@@ -134,23 +170,36 @@ func (a *App) GetFolderAPI(path string) FolderData {
 	for _, file := range files {
 		filename := file.Name()
 		hidden, _ := fileutil.FileIsHidden(path + "/" + filename)
+		fullPath := path + "/" + filename
 
-		if file.IsDir() {
-			FileList = append(FileList, Filestruct{
-				FullPath:  path + "/" + filename,
-				Name:      filename,
-				Size:      file.Size(),
-				ModDate:   file.ModTime(),
-				Extension: filepath.Ext(filename),
-				Hidden:    hidden,
-			})
-		} else {
+		//Check if file is Symlink
+		link, errIsLink := os.Readlink(path + "/" + filename)
+		isLink := errIsLink == nil
+		if isLink {
+			fullPath = link
+		}
+
+		if filepath.Ext(filename) == ".lnk" {
+
+		}
+
+		if file.IsDir() || isLink {
 			FolderList = append(FolderList, Folderstruct{
-				FullPath: path + "/" + filename,
+				FullPath: fullPath,
 				Name:     filename,
 				Size:     file.Size(),
 				ModDate:  file.ModTime(),
 				Hidden:   hidden,
+				IsLink:   isLink,
+			})
+		} else {
+			FileList = append(FileList, Filestruct{
+				FullPath:  fullPath,
+				Name:      filename,
+				Size:      file.Size(),
+				ModDate:   file.ModTime(),
+				Hidden:    hidden,
+				Extension: filepath.Ext(filename),
 			})
 		}
 	}

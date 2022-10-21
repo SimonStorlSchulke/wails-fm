@@ -1,5 +1,8 @@
 <script lang="ts">
   import FileList from "./FileList.svelte"
+  import FileInspector from "./FileInspector.svelte"
+  import { GetHomeDir } from "../wailsjs/go/main/App.js";
+
 
   export let address: string = "C:/Users/simon/"
 
@@ -20,39 +23,54 @@
 
   let SubmitAddress;
 
+  async function GoHome() {
+    await GetHomeDir().then((adr) => {
+      address = adr
+      console.log(address)
+    })
+    SubmitAddress(false)
+  }
+
   //GetThumbnailAsBase64(name).then(res => document.querySelector<HTMLImageElement>("#logo").src = "data:image/png;base64," + res)*/
   
 </script>
 
 <main>
-  <!--<img alt="Wails logo" id="logo" src="">-->
+
   <div class="input-box" id="input">
-    <input type=checkbox bind:checked={showhiddenFiles} on:change={updateHiddenFiled} id="cb-hiddenfiles"> <label for="cb-hiddenfiles">Show Hidden Files</label>
+    <button class="btn" on:click={GoHome}>Home</button>
+    <input type=checkbox bind:checked={showhiddenFiles} on:change={updateHiddenFiled} id="cb-hiddenfiles"> <label for="cb-hiddenfiles">Show Hidden</label>
     <button class="btn" on:click={() => SubmitAddress(true)}>^</button>
     <input autocomplete="off" bind:value={address} class="input" id="name" type="text"/>
-    <button class="btn" on:click={() => SubmitAddress(false)}>-></button>
+    <button class="btn" on:click={() => SubmitAddress(false)}>></button>
   </div>
   <div class="flex-container">
-    <FileList bind:fileViewAddress={address} bind:submitPath={SubmitAddress}/>
-    <div class="inspector">Inspector</div>
+    <FileList bind:fileViewAddress={address} bind:submitPath={SubmitAddress} bind:showhiddenFiles={showhiddenFiles}/>
+    <FileInspector/>
   </div>
 </main>
 
 <style>
 
+  .input-box {
+    background: rgba(0, 0, 0, 0.543);
+    text-align: left;
+    padding: 0px;
+    height: 36px;
+  }
+
   .input-box .btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    padding: 0 8px;
+    min-width: 30px;
+    height: 100%;
+    margin: 0px;
     cursor: pointer;
+    font-weight: bold;
+    background-image: linear-gradient(rgb(52, 69, 105),rgb(33, 45, 69));
+    color: white;
   }
 
   .input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
+    background-image: linear-gradient(rgb(70, 95, 137),rgb(36, 52, 85));
   }
 
   .input-box .input {
@@ -62,19 +80,19 @@
     height: 30px;
     line-height: 30px;
     padding: 0 10px;
-    background-color: rgba(240, 240, 240, 1);
+    background-color: rgb(41, 54, 82);
     -webkit-font-smoothing: antialiased;
-    width: 600px;
+    width: 700px;
+    color: white;
   }
 
   .input-box .input:hover {
     border: none;
-    background-color: rgba(255, 255, 255, 1);
   }
 
   .input-box .input:focus {
     border: none;
-    background-color: rgba(255, 255, 255, 1);
+    background-color: rgb(44, 60, 95);
   }
 
 </style>

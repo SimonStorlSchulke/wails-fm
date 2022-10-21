@@ -1,7 +1,8 @@
 <script lang="ts">
     let folderData;
-    let showhiddenFiles: boolean = false;
+    export let showhiddenFiles: boolean = false;
     import FileVIew from "./FileVIew.svelte"
+
 
     import { GetFolderAPI } from "../wailsjs/go/main/App.js";
 
@@ -34,9 +35,12 @@
         });
     }
 
+    export function Home() {
+
+    }
+
     function folderDoubleclicked(foldername) {
-        fileViewAddress = sanitizePath(fileViewAddress);
-        fileViewAddress += foldername.detail.foldername;
+        fileViewAddress = foldername.detail.foldername;
         submitPath(false);
     }
     window.onload = function() {submitPath(false)}
@@ -47,13 +51,10 @@
     {#key folderData}
         <section>
             {#if folderData}
-                {#if folderData.Files}
-                    {#each folderData.Files as fileinfo}
-                        {#if !fileinfo.Hidden || showhiddenFiles}
-                            <FileVIew
-                                on:message={folderDoubleclicked}
-                                {fileinfo}
-                                isDir={true}
+                {#if folderData.Folders}
+                    {#each folderData.Folders as folderInfo}
+                        {#if !folderInfo.Hidden || showhiddenFiles}
+                            <FileVIew on:message={folderDoubleclicked} fileinfo={folderInfo} isDir={true}
                             />
                         {/if}
                     {/each}
@@ -63,10 +64,10 @@
 
         <section>
             {#if folderData}
-                {#if folderData.Folders}
-                    {#each folderData.Folders as folderinfo}
-                        {#if !folderinfo.Hidden || showhiddenFiles}
-                            <FileVIew fileinfo={folderinfo} isDir={false} />
+                {#if folderData.Files}
+                    {#each folderData.Files as fileInfo}
+                        {#if !fileInfo.Hidden || showhiddenFiles}
+                            <FileVIew fileinfo={fileInfo} isDir={false} />
                         {/if}
                     {/each}
                 {/if}

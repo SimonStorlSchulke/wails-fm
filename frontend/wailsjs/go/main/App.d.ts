@@ -5,7 +5,11 @@ import {main} from '../models';
 
 export function FormatDate(arg1:time.Time,arg2:string):Promise<string>;
 
+export function GetFileDetailsSingle(arg1:string):Promise<main.FileDetailsSingle>;
+
 export function GetFolderAPI(arg1:string):Promise<main.FolderData>;
+
+export function GetHomeDir():Promise<string>;
 
 export function GetLocalFile(arg1:string):Promise<string>;
 
