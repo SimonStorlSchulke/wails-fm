@@ -2,13 +2,27 @@ package fileutil
 
 import (
 	"log"
+	"os"
 	"path"
 	"runtime"
 	"syscall"
+	"time"
 	"unicode/utf8"
 
 	"golang.org/x/tools/godoc/vfs"
 )
+
+func CreationTme(fi os.FileInfo) time.Time {
+	return time.Unix(0, fi.Sys().(*syscall.Win32FileAttributeData).CreationTime.Nanoseconds())
+}
+
+func CreatrionTimeFromPath(path string) (time.Time, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return CreationTme(fi), nil
+}
 
 func FileIsHidden(filename string) (bool, error) {
 

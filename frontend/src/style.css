@@ -1,6 +1,5 @@
 html {
     background-color: rgb(34, 43, 58);
-    text-align: center;
     color: white;
 }
 
@@ -64,7 +63,7 @@ body {
     flex-basis: auto;
     align-self: auto;
     order: 0;
-    padding: 0px 15px;
+    padding: 0px 2px 0px 15px;
     margin-top: 20px;
     text-align: left;
     max-height: 100%;
@@ -82,30 +81,16 @@ body {
     min-width: 280px;
 }
 
-.file-card {
-    display: inline-block;
-    margin: 5px;
-    background: black;
-    width: 150px;
-    height: 120px;
-    overflow: hidden;
-    border-width: 0px 0px 0px 5px;
-    border-style: solid;
-    padding: 10px;
-    white-space: nowrap;
-    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.402);
+.sidebar {
+    display: block;
+    flex-basis: auto;
+    align-self: auto;
+    background-color: rgba(0, 0, 0, 0.356);
+    order: 0;
+    min-width: 280px;
 }
 
 
-.file-hidden {
-    opacity: 0.7;
-}
-
-.dir {
-    background-color: rgb(103, 86, 35);
-    height: 40px;
-    border-color: transparent;
-}
 
 .hidden {
     display: none;
@@ -132,12 +117,4 @@ body {
 .file-area p {
     text-align: left;
     margin: 0px;
-}
-
-.file-area .filename {
-    max-width: calc(100% - 20px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: bold;
-    color: white
 }

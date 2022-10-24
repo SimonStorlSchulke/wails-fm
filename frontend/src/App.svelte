@@ -1,7 +1,9 @@
 <script lang="ts">
   import FileList from "./FileList.svelte"
   import FileInspector from "./FileInspector.svelte"
-  import { GetHomeDir } from "../wailsjs/go/main/App.js";
+  import Sidebar from "./Sidebar.svelte"
+  import { GetHomeDir, GetMountPoints } from "../wailsjs/go/main/App.js";
+  import { zoomLevel } from "./AppState";
 
 
   export let address: string = "C:/Users/simon/"
@@ -31,7 +33,25 @@
     SubmitAddress(false)
   }
 
-  //GetThumbnailAsBase64(name).then(res => document.querySelector<HTMLImageElement>("#logo").src = "data:image/png;base64," + res)*/
+  const tree = {
+		label: "USA", children: [
+			{label: "Florida", children: [
+				{label: "Jacksonville"},
+				{label: "Orlando", children: [
+					{label: "Disney World"},
+					{label: "Universal Studio"},
+					{label: "Sea World"},
+				]},
+				{label: "Miami"},
+			]},
+			{label: "California", children: [
+				{label: "San Francisco"},
+				{label: "Los Angeles"},
+				{label: "Sacramento"},
+			]},
+		],
+	}
+
   
 </script>
 
@@ -43,11 +63,17 @@
     <button class="btn" on:click={() => SubmitAddress(true)}>^</button>
     <input autocomplete="off" bind:value={address} class="input" id="name" type="text"/>
     <button class="btn" on:click={() => SubmitAddress(false)}>></button>
+
+    Zoom <input type="range" min="1" max="20" bind:value={$zoomLevel} class="slider" id="myRange">
+
   </div>
+
   <div class="flex-container">
+    <Sidebar {tree}/>
     <FileList bind:fileViewAddress={address} bind:submitPath={SubmitAddress} bind:showhiddenFiles={showhiddenFiles}/>
     <FileInspector/>
   </div>
+
 </main>
 
 <style>

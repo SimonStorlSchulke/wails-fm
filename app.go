@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	b64 "encoding/base64"
 	"image"
 	"image/jpeg"
@@ -11,14 +13,17 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/djherbis/atime"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/mimetype"
 
 	fileutil "wails-fm/core"
 
 	"github.com/nfnt/resize"
+	"github.com/shirou/gopsutil/disk"
 )
 
 // App struct
@@ -37,14 +42,24 @@ func NewApp() *App {
 
 func (a *App) GetHomeDir() string {
 	path, _ := os.UserHomeDir()
-	println(path)
 	return path
 }
+
+var thumbCacheFolder string
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+	thumbCacheFolder, _ = os.UserHomeDir()
+	thumbCacheFolder += "/AppData/Roaming/wails-fm/thumbnail_cache/"
+
+	thbErr := os.MkdirAll(thumbCacheFolder, os.ModePerm)
+	if thbErr != nil {
+		println("Could not create thumbnailfolder at " + thumbCacheFolder + " " + thbErr.Error())
+	}
+
 }
 
 func (a *App) GetLocalFile(requestedFilename string) string {
@@ -65,26 +80,121 @@ func RemoveFirstChar(input string) string {
 	return input[1:]
 }
 
+func GenerateThumbnailFilename(path string) string {
+	path = strings.ReplaceAll(path, ":", "$D%")
+	path = strings.ReplaceAll(path, "\\", "$S%")
+	path = strings.ReplaceAll(path, "/", "$S%")
+
+	thumbCacheFolder, _ := os.UserHomeDir()
+	thumbCacheFolder += "/AppData/Roaming/wails-fm/thumbnail_cache/"
+	return thumbCacheFolder + path + ".png"
+}
+
+func ThumbnailInCache(path string) (bool, string) {
+	path = GenerateThumbnailFilename(path)
+	if _, err := os.Stat(path); err == nil {
+		return true, path
+	} else {
+		return false, ""
+	}
+}
+
+func (a *App) GetMountPoints() []string {
+
+	partitions, _ := disk.Partitions(false)
+	partitionMountpoints := make([]string, len(partitions))
+	for i, partition := range partitions {
+		partitionMountpoints[i] = partition.Mountpoint
+	}
+	return partitionMountpoints
+}
+
+func (a *App) GetSubDirPaths(path string) []string {
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		return []string{}
+	}
+
+	dirs := []string{}
+
+	for i := range files {
+		if !files[i].IsDir() {
+			continue
+		}
+
+		dirPath := filepath.Join(path, files[i].Name())
+
+		if files[i].IsDir() {
+			dirs = append(dirs, dirPath)
+		}
+	}
+
+	return dirs
+}
+
 func GetThumbnail(path string) string {
 
-	imagePath, _ := os.Open(path)
-	defer imagePath.Close()
-	srcImage, _, _ := image.Decode(imagePath)
+	isPng := strings.HasSuffix(strings.ToLower(path), ".png")
+	//isWebp := strings.HasSuffix(strings.ToLower(path), ".webp")
+	isJpg := strings.HasSuffix(strings.ToLower(path), ".jpg") || strings.HasSuffix(strings.ToLower(path), ".jpeg")
 
-	thumbnail := resize.Thumbnail(64, 64, srcImage, resize.NearestNeighbor)
+	if !(isPng || isJpg) {
+		return "invalid filetype, only jpg and png are supported for now"
+	}
+
+	thumbExists, thumbPath := ThumbnailInCache(path)
+
+	if thumbExists {
+
+		// Open file on disk.
+		f, _ := os.Open(thumbPath)
+		defer f.Close()
+
+		// Read entire JPG into byte slice.
+		reader := bufio.NewReader(f)
+		content, _ := ioutil.ReadAll(reader)
+		println("exists")
+		// Encode as base64.
+		return base64.StdEncoding.EncodeToString(content)
+	}
+
+	imagePath, openErr := os.Open(path)
+	if openErr != nil {
+		println(openErr.Error())
+		return ""
+	}
+	defer imagePath.Close()
+	srcImage, _, decodeErr := image.Decode(imagePath)
+	if decodeErr != nil {
+		println(decodeErr.Error())
+		return ""
+	}
+
+	thumbnail := resize.Thumbnail(128, 128, srcImage, resize.NearestNeighbor)
 
 	buf := new(bytes.Buffer)
 
 	var err error = nil
 
-	if filepath.Ext(path) == ".png" {
+	filePath := GenerateThumbnailFilename(path)
+
+	if isPng {
 		err = png.Encode(buf, thumbnail)
-	} else {
+
+		out, _ := os.Create(filePath)
+		defer out.Close()
+		err = png.Encode(out, thumbnail)
+	} else if isJpg {
 		err = jpeg.Encode(buf, thumbnail, nil)
+
+		out, _ := os.Create(filePath)
+		defer out.Close()
+		err = jpeg.Encode(out, thumbnail, nil)
 	}
 
 	if err != nil {
-		return "ERROR: " + err.Error()
+		return ""
 	}
 	send_s3 := buf.Bytes()
 
@@ -147,7 +257,14 @@ type AppState struct {
 }
 
 type FileDetailsSingle struct {
-	MimeType string
+	Name         string
+	Data         string
+	Size         int64
+	MimeType     string
+	CreationTime time.Time
+	ModifiedTime time.Time
+	AccessTime   time.Time
+	Owner        string
 }
 
 func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
@@ -157,8 +274,20 @@ func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
 		mType = mimetype.String()
 	}
 
+	fi, err := os.Lstat(path)
+	at, err := atime.Stat(path)
+	crTime, err := fileutil.CreatrionTimeFromPath(path)
+	if err != nil {
+
+	}
+
 	return FileDetailsSingle{
-		MimeType: mType,
+		Name:         fi.Name(),
+		Size:         fi.Size(),
+		MimeType:     mType,
+		CreationTime: crTime,
+		ModifiedTime: fi.ModTime(),
+		AccessTime:   at,
 	}
 }
 

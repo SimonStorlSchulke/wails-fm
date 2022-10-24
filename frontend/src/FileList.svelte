@@ -49,32 +49,33 @@
 
 <div class="file-area">
     {#key folderData}
-        <section>
-            {#if folderData}
-                {#if folderData.Folders}
-                    {#each folderData.Folders as folderInfo}
-                        {#if !folderInfo.Hidden || showhiddenFiles}
-                            <FileVIew on:message={folderDoubleclicked} fileinfo={folderInfo} isDir={true}
-                            />
-                        {/if}
-                    {/each}
-                {/if}
+    <section>
+        {#if folderData}
+        {#if folderData.Folders}
+        {#each folderData.Folders as folderInfo}
+            {#if !folderInfo.Hidden || showhiddenFiles}
+                <FileVIew on:message={folderDoubleclicked} fileinfo={folderInfo} isDir={true}
+                />
             {/if}
-        </section>
+        {/each}
+        {/if}
+        {/if}
+    </section>
 
-        <section>
-            {#if folderData}
-                {#if folderData.Files}
-                    {#each folderData.Files as fileInfo}
-                        {#if !fileInfo.Hidden || showhiddenFiles}
-                            <FileVIew fileinfo={fileInfo} isDir={false} />
-                        {/if}
-                    {/each}
-                {/if}
+    <section>
+        {#if folderData}
+        {#if folderData.Files}
+        {#each folderData.Files as fileInfo}
+            {#if !fileInfo.Hidden || showhiddenFiles}
+                <FileVIew fileinfo={fileInfo} isDir={false} />
             {/if}
-        </section>
+        {/each}
+        {/if}
+        {/if}
+    </section>
     {/key}
 </div>
 
 <style>
+
 </style>
