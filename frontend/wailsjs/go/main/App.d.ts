@@ -17,6 +17,8 @@ export function GetSubDirPaths(arg1:string):Promise<Array<string>>;
 
 export function GetThumbnailAsBase64(arg1:string):Promise<string>;
 
-export function GetTree(arg1:string):Promise<main.Fs>;
+export function GetTree(arg1:string):Promise<{[key: string]: main.Fs}>;
+
+export function GetTreeHTML(arg1:string):Promise<string>;
 
 export function OpenWithDefaultApp(arg1:string):Promise<void>;

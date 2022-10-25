@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/base64"
 	b64 "encoding/base64"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -360,7 +361,7 @@ func GetSubDirPaths(path string) []string {
 	return dirs
 }
 
-func (a *App) GetTree(drive string) Fs {
+func (a *App) GetTree(drive string) map[string]Fs {
 
 	var tree map[string]Fs = map[string]Fs{}
 
@@ -371,8 +372,34 @@ func (a *App) GetTree(drive string) Fs {
 
 		for _, path := range GetSubDirPaths(mount + "/") {
 			tree[mount][path] = map[string]Fs{}
+
+			for _, subPath := range GetSubDirPaths(mount + "/" + path) {
+				tree[mount][path][subPath] = map[string]Fs{}
+			}
+
 		}
 	}
 
 	return tree
+}
+
+func (a *App) GetTreeHTML(drive string) string {
+
+	html := "<ul>"
+
+	mounts := GetMountPoints()
+
+	for _, mount := range mounts {
+		html += fmt.Sprintf("<li>%s</li>", mount)
+
+		for _, path := range GetSubDirPaths(mount + "/") {
+
+			for _, subPath := range GetSubDirPaths(mount + "/" + path) {
+				println(subPath)
+			}
+
+		}
+	}
+	html += "</ul>"
+	return html
 }

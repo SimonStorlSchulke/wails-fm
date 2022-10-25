@@ -34,6 +34,10 @@ export function GetTree(arg1) {
   return window['go']['main']['App']['GetTree'](arg1);
 }
 
+export function GetTreeHTML(arg1) {
+  return window['go']['main']['App']['GetTreeHTML'](arg1);
+}
+
 export function OpenWithDefaultApp(arg1) {
   return window['go']['main']['App']['OpenWithDefaultApp'](arg1);
 }
