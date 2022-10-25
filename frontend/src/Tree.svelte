@@ -1,35 +1,64 @@
 <script lang="ts">
-  import { GetTree, GetTreeHTML } from "../wailsjs/go/main/App.js";
-  import App from "./App.svelte";
+  import { GetTreeHTML } from "../wailsjs/go/main/App.js";
 
-  let treeStruct: Array<any> = [];
+  function AddHtmlToTree(html: string, element: HTMLElement) {
+    let dom = document.createElement("div");
+    dom.innerHTML = html;
+    let ul: HTMLElement = dom.childNodes[0] as HTMLElement;
+    element.parentElement.append(ul);
 
-  function WalkTree() {}
+    ul["expanded"] = false
 
+    let selector: HTMLElement = ul.querySelector("span")
 
-  GetTree("C:/").then((mp) => {
+    if (!selector) {
+      return
+    } 
+
+    selector.addEventListener("click", (e) => {
+      
+      e.stopPropagation()
+      let el = e.target as HTMLElement
+
+      if (ul["expanded"] == true) {
+        ul["expanded"] = false;
+
+        ul.setAttribute("expanded", "false");
+        
+        ul.querySelectorAll("ul").forEach((ul)=>ul.remove())
+        
+      } 
+      
+      else {
+        ul["expanded"] = true;
+        let fullPath: string = ul.getAttribute("data-path");
+        console.log(fullPath)
+
+        GetTreeHTML(fullPath).then((items) => {
+          items.forEach((li) => {
+            AddHtmlToTree(li, e.target as HTMLElement);
+          });
+        });
+      }
+
+    });
+  }
+
+  GetTreeHTML("").then((mp) => {
+    const ft: HTMLElement = document.querySelector(".filetree-spawner");
+    mp.forEach((li) => {
+      AddHtmlToTree(li, ft);
+    });
   });
 </script>
 
-<div class="wrapper" style="float: left;" />
+<div class="wrapper" style="float: left;">
+  <ul style="margin-left: -20px;">
+    <div class="filetree-spawner"/>
+  </ul>
+</div>
 
 <style>
   .wrapper {
-    --tree-view-base00: #363755;
-    --tree-view-base01: #604d49;
-    --tree-view-base02: #6d5a55;
-    --tree-view-base03: #d1929b;
-    --tree-view-base04: #b79f8d;
-    --tree-view-base05: #f9f8f2;
-    --tree-view-base06: #f7f4f1;
-    --tree-view-base07: #faf8f5;
-    --tree-view-base08: #fa3e7e;
-    --tree-view-base09: #fd993c;
-    --tree-view-base0A: #f6bf81;
-    --tree-view-base0B: #f60000;
-    --tree-view-base0C: #b4efe4;
-    --tree-view-base0D: #85d9ef;
-    --tree-view-base0E: #be87ff;
-    --tree-view-base0F: #d6724c;
   }
 </style>

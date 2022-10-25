@@ -342,6 +342,12 @@ func (a *App) GetThumbnailAsBase64(requestedFilename string) string {
 
 type Fs map[string]Fs
 
+type fol struct {
+	Name     string
+	FullPath string
+	childs   []fol
+}
+
 func RequestTreeExpand() {}
 
 func GetSubDirPaths(path string) []string {
@@ -361,45 +367,68 @@ func GetSubDirPaths(path string) []string {
 	return dirs
 }
 
+func (a *App) GetListView(path string) string {
+	subDirs := []string{}
+	if path == "" {
+		subDirs = GetMountPoints()
+	} else {
+		subDirs = GetSubDirPaths(path)
+	}
+
+	html := ""
+
+	for _, dir := range subDirs {
+		html += fmt.Sprintf("<li>%s</li>", dir)
+	}
+	return html
+}
+
 func (a *App) GetTree(drive string) map[string]Fs {
 
 	var tree map[string]Fs = map[string]Fs{}
 
 	mounts := GetMountPoints()
-
+	mounts = []string{"A:"}
+	fullPath := ""
 	for _, mount := range mounts {
 		tree[mount] = map[string]Fs{}
+		fullPath += mount + "/"
 
 		for _, path := range GetSubDirPaths(mount + "/") {
-			tree[mount][path] = map[string]Fs{}
+			fullPath += path + "/"
+			tree[mount][fullPath] = map[string]Fs{}
 
 			for _, subPath := range GetSubDirPaths(mount + "/" + path) {
-				tree[mount][path][subPath] = map[string]Fs{}
+				nextPath := fullPath + "/" + subPath
+				tree[mount][fullPath][nextPath] = map[string]Fs{}
 			}
-
 		}
 	}
 
 	return tree
 }
 
-func (a *App) GetTreeHTML(drive string) string {
+func (a *App) GetTreeHTML(path string) []string {
 
-	html := "<ul>"
+	subDirs := []string{}
+	if path == "" {
+		subDirs = GetMountPoints()
+	} else {
+		subDirs = GetSubDirPaths(path)
+	}
 
-	mounts := GetMountPoints()
+	htmlStr := []string{}
 
-	for _, mount := range mounts {
-		html += fmt.Sprintf("<li>%s</li>", mount)
+	for _, dir := range subDirs {
+		//Read Subdirs to check wether they contain subfolders and can be expanded... kinda uselessly expensive? TODO.
+		subSubDirs := GetSubDirPaths(path + dir + "/")
+		subdirLen := len(subSubDirs)
 
-		for _, path := range GetSubDirPaths(mount + "/") {
-
-			for _, subPath := range GetSubDirPaths(mount + "/" + path) {
-				println(subPath)
-			}
-
+		if subdirLen > 0 {
+			htmlStr = append(htmlStr, fmt.Sprintf("<ul data-path='%s'><li data-empty='false' >%s <span data-path='%s'>%v</span></li></ul>", path+dir+"/", dir, path+dir+"/", subdirLen))
+		} else {
+			htmlStr = append(htmlStr, fmt.Sprintf("<ul data-path='%s'><li data-empty='true' >%s</li></ul>", path+dir+"/", dir))
 		}
 	}
-	html += "</ul>"
-	return html
+	return htmlStr
 }

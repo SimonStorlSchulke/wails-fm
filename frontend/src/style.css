@@ -36,6 +36,38 @@ body {
 }
 
 
+ul {
+    display: block;
+    padding-left: 11px;
+  }
+
+  li {
+    display: block;
+    max-width: 150px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  li span {
+    color: rgba(255, 255, 255, 0.575);
+    background-color: rgb(58, 50, 7);
+    border-radius: 20%;
+    min-width: 25px;
+    text-align: center;
+    height: 20px;
+    display: inline-block;
+  }
+
+  li span:hover {
+    color: rgba(0, 0, 0, 0.575);
+    background-color: rgb(190, 168, 40);
+  }
+
+  .filetree {
+    padding: 0px;
+  }
+
 /* width */
 ::-webkit-scrollbar {
   width: 10px;

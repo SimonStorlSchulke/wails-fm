@@ -18,6 +18,10 @@ export function GetHomeDir() {
   return window['go']['main']['App']['GetHomeDir']();
 }
 
+export function GetListView(arg1) {
+  return window['go']['main']['App']['GetListView'](arg1);
+}
+
 export function GetLocalFile(arg1) {
   return window['go']['main']['App']['GetLocalFile'](arg1);
 }
