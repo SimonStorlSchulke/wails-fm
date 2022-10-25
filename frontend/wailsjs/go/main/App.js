@@ -22,16 +22,16 @@ export function GetLocalFile(arg1) {
   return window['go']['main']['App']['GetLocalFile'](arg1);
 }
 
-export function GetMountPoints() {
-  return window['go']['main']['App']['GetMountPoints']();
-}
-
 export function GetSubDirPaths(arg1) {
   return window['go']['main']['App']['GetSubDirPaths'](arg1);
 }
 
 export function GetThumbnailAsBase64(arg1) {
   return window['go']['main']['App']['GetThumbnailAsBase64'](arg1);
+}
+
+export function GetTree(arg1) {
+  return window['go']['main']['App']['GetTree'](arg1);
 }
 
 export function OpenWithDefaultApp(arg1) {

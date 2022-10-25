@@ -1,41 +1,25 @@
-<script context="module">
-    // retain module scoped expansion state for each tree node
-    const _expansionState = {
-        /* treeNodeId: expanded <boolean> */
-    };
-</script>
-
 <script lang="ts">
-    export let tree;
-    const { label, children } = tree;
+    import TreeView from 'svelte-tree-view'
+    import { GetTree } from "../wailsjs/go/main/App.js";
 
-    let expanded = _expansionState[label] || false;
-    const toggleExpansion = () => {
-        expanded = _expansionState[label] = !expanded;
-    };
-    $: arrowDown = expanded;
+
+    let data = {
+		a: [1, 2, 3],
+		b: new Map([
+		['c', { d: null }],
+			['e', { f: [9, 8, 7] }]
+		])
+	}
+
+    GetTree("C:/").then((mp) => {
+        data = mp
+    })
+    
 </script>
 
-<ul>
-    <li>
-        {#if children}
-            <span on:click={toggleExpansion}>
-                <span class="arrow" class:arrowDown>&#x25b6</span>
-                {label}
-            </span>
-            {#if expanded}
-                {#each children as child}
-                    <svelte:self tree={child} />
-                {/each}
-            {/if}
-        {:else}
-            <span>
-                <span class="no-arrow" />
-                {label}
-            </span>
-        {/if}
-    </li>
-</ul>
+<div style="float: left;">
+<TreeView data={data}/>
+</div>
 
 <style>
 ul {

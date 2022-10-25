@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { GetMountPoints, GetSubDirPaths } from "../wailsjs/go/main/App.js";
+    import { GetSubDirPaths } from "../wailsjs/go/main/App.js";
     import Tree from "./Tree.svelte"
 	export let tree
 	const {label, children} = tree
 
     let mounts: string[]
-    GetMountPoints().then((mps) => mounts = mps)
 
     GetSubDirPaths("A").then((mps) => {
         mounts = mps

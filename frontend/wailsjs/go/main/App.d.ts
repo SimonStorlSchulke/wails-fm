@@ -13,10 +13,10 @@ export function GetHomeDir():Promise<string>;
 
 export function GetLocalFile(arg1:string):Promise<string>;
 
-export function GetMountPoints():Promise<Array<string>>;
-
 export function GetSubDirPaths(arg1:string):Promise<Array<string>>;
 
 export function GetThumbnailAsBase64(arg1:string):Promise<string>;
+
+export function GetTree(arg1:string):Promise<main.Fs>;
 
 export function OpenWithDefaultApp(arg1:string):Promise<void>;

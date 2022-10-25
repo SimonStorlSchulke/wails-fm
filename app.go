@@ -99,7 +99,7 @@ func ThumbnailInCache(path string) (bool, string) {
 	}
 }
 
-func (a *App) GetMountPoints() []string {
+func GetMountPoints() []string {
 
 	partitions, _ := disk.Partitions(false)
 	partitionMountpoints := make([]string, len(partitions))
@@ -337,4 +337,42 @@ func (a *App) GetFolderAPI(path string) FolderData {
 
 func (a *App) GetThumbnailAsBase64(requestedFilename string) string {
 	return GetThumbnail(requestedFilename)
+}
+
+type Fs map[string]Fs
+
+func RequestTreeExpand() {}
+
+func GetSubDirPaths(path string) []string {
+	f, err := os.ReadDir(path)
+
+	if err != nil {
+		return []string{}
+	}
+
+	dirs := []string{}
+
+	for _, d := range f {
+		if d.IsDir() {
+			dirs = append(dirs, d.Name())
+		}
+	}
+	return dirs
+}
+
+func (a *App) GetTree(drive string) Fs {
+
+	var tree map[string]Fs = map[string]Fs{}
+
+	mounts := GetMountPoints()
+
+	for _, mount := range mounts {
+		tree[mount] = map[string]Fs{}
+
+		for _, path := range GetSubDirPaths(mount + "/") {
+			tree[mount][path] = map[string]Fs{}
+		}
+	}
+
+	return tree
 }

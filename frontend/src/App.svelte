@@ -2,7 +2,7 @@
   import FileList from "./FileList.svelte"
   import FileInspector from "./FileInspector.svelte"
   import Sidebar from "./Sidebar.svelte"
-  import { GetHomeDir, GetMountPoints } from "../wailsjs/go/main/App.js";
+  import { GetHomeDir } from "../wailsjs/go/main/App.js";
   import { zoomLevel } from "./AppState";
 
 
