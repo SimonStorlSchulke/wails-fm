@@ -1,6 +1,8 @@
 <script lang="ts">
   import { GetTreeHTML } from "../wailsjs/go/main/App.js";
 
+  let selectedDir;
+
   function AddHtmlToTree(html: string, element: HTMLElement) {
     let dom = document.createElement("div");
     dom.innerHTML = html;
@@ -13,7 +15,12 @@
 
     if (!selector) {
       return
-    } 
+    }
+
+    ul.addEventListener("click", (e) => {
+      e.stopPropagation()
+      selectedDir = ul.getAttribute("data-path")
+    })
 
     selector.addEventListener("click", (e) => {
       
@@ -32,7 +39,6 @@
       else {
         ul["expanded"] = true;
         let fullPath: string = ul.getAttribute("data-path");
-        console.log(fullPath)
 
         GetTreeHTML(fullPath).then((items) => {
           items.forEach((li) => {

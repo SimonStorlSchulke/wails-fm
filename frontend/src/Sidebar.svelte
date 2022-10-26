@@ -11,6 +11,8 @@
     })
 
     let selectedMount;
+
+
 </script>
 
 <div class="sidebar">
@@ -26,7 +28,7 @@
           
     </fieldset>
 
-    <Tree {tree}/>
+    <Tree/>
 </div>
 
 <style>
