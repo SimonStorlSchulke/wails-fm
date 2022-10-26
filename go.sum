@@ -54,8 +54,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.1.0 h1:OJxPu/4vQxSwAjVVpSNiMVGyYyInpm0UtlDUgVxpaSo=
-github.com/wailsapp/wails/v2 v2.1.0/go.mod h1:zdc9YVrIijjuNNkLOO3UpTU6M12TJe6TlriL+3ttlMM=
+github.com/wailsapp/wails/v2 v2.0.0 h1:EsiIMQYi3XeAJvvJNYTWVSyaEYwuBsSFU9ACSq7Ly4s=
+github.com/wailsapp/wails/v2 v2.0.0/go.mod h1:z3os4dBFCOmPhFHjjEKY4KygTVFKAGECkS9/mKm1wEU=
 github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPRg=
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 h1:7I4JAnoQBe7ZtJcBaYHi5UtiO8tQHbUSXxL+pnGRANg=

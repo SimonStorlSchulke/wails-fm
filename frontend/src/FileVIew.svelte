@@ -28,7 +28,6 @@
         }
         if (isDir) {
             if (fileinfo.IsLink) {
-                console.log("IS DIR");
                 card_class += " file-link";
             }
         }
@@ -241,8 +240,8 @@
         padding: 14px 6px;
     }
 
-    .file-card .file-selected .file-info {
-        color: beige;
+    .file-selected .file-info {
+        background-image: linear-gradient(#0000, rgba(24, 110, 215, 0.228) 50px);
     }
 
     .file-card .filename {

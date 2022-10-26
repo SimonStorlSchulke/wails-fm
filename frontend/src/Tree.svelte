@@ -1,42 +1,38 @@
 <script lang="ts">
   import { GetTreeHTML } from "../wailsjs/go/main/App.js";
+  import { writable } from 'svelte/store';
+  import { selectedSidebarFolder } from "./AppState";
 
-  let selectedDir;
 
   function AddHtmlToTree(html: string, element: HTMLElement) {
     let dom = document.createElement("div");
     dom.innerHTML = html;
     let ul: HTMLElement = dom.childNodes[0] as HTMLElement;
+    let liv: HTMLElement = dom.querySelector("li") as HTMLElement
     element.parentElement.append(ul);
 
     ul["expanded"] = false
 
-    let selector: HTMLElement = ul.querySelector("span")
+    let selector: HTMLElement = ul.querySelector(".tree-expander")
 
     if (!selector) {
       return
     }
 
-    ul.addEventListener("click", (e) => {
-      e.stopPropagation()
-      selectedDir = ul.getAttribute("data-path")
+    liv.addEventListener("click", (e) => {
+      selectedSidebarFolder.set((e.target as HTMLElement).getAttribute("data-path"))
     })
 
     selector.addEventListener("click", (e) => {
-      
       e.stopPropagation()
-      let el = e.target as HTMLElement
-
       if (ul["expanded"] == true) {
-        ul["expanded"] = false;
-
-        ul.setAttribute("expanded", "false");
-        
+        selector.classList.remove("expanded")
+        ul["expanded"] = false;        
         ul.querySelectorAll("ul").forEach((ul)=>ul.remove())
-        
       } 
       
       else {
+        selector.classList.add("expanded")
         ul["expanded"] = true;
         let fullPath: string = ul.getAttribute("data-path");
 
@@ -66,5 +62,9 @@
 
 <style>
   .wrapper {
+    overflow: scroll;
+    max-height: 100%;
+    width: calc(100% - 52px);
+    max-width: calc(100% - 52px);
   }
 </style>

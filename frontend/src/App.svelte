@@ -3,8 +3,7 @@
   import FileInspector from "./FileInspector.svelte"
   import Sidebar from "./Sidebar.svelte"
   import { GetHomeDir } from "../wailsjs/go/main/App.js";
-  import { zoomLevel } from "./AppState";
-
+  import { selectedFilePaths, zoomLevel } from "./AppState";
 
   export let address: string = "C:/Users/simon/"
 
@@ -33,26 +32,9 @@
     SubmitAddress(false)
   }
 
-  const tree = {
-		label: "USA", children: [
-			{label: "Florida", children: [
-				{label: "Jacksonville"},
-				{label: "Orlando", children: [
-					{label: "Disney World"},
-					{label: "Universal Studio"},
-					{label: "Sea World"},
-				]},
-				{label: "Miami"},
-			]},
-			{label: "California", children: [
-				{label: "San Francisco"},
-				{label: "Los Angeles"},
-				{label: "Sacramento"},
-			]},
-		],
-	}
 
-  let selectedDir;
+
+  const tree = {}
 
 </script>
 
@@ -70,7 +52,7 @@
   </div>
 
   <div class="flex-container">
-    <Sidebar {tree}/>
+    <Sidebar/>
     <FileList bind:fileViewAddress={address} bind:submitPath={SubmitAddress} bind:showhiddenFiles={showhiddenFiles}/>
     <FileInspector/>
   </div>
@@ -109,7 +91,7 @@
     padding: 0 10px;
     background-color: rgb(41, 54, 82);
     -webkit-font-smoothing: antialiased;
-    width: 700px;
+    width: calc(100% - 445px);
     color: white;
   }
 

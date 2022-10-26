@@ -8,7 +8,7 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/wailsapp/mimetype v1.4.1
-	github.com/wailsapp/wails/v2 v2.1.0
+	github.com/wailsapp/wails/v2 v2.0.0
 	golang.org/x/tools v0.2.0
 )
 

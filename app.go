@@ -155,7 +155,7 @@ func GetThumbnail(path string) string {
 		// Read entire JPG into byte slice.
 		reader := bufio.NewReader(f)
 		content, _ := ioutil.ReadAll(reader)
-		println("exists")
+
 		// Encode as base64.
 		return base64.StdEncoding.EncodeToString(content)
 	}
@@ -425,9 +425,9 @@ func (a *App) GetTreeHTML(path string) []string {
 		subdirLen := len(subSubDirs)
 
 		if subdirLen > 0 {
-			htmlStr = append(htmlStr, fmt.Sprintf("<ul data-path='%s'><li data-empty='false' >%s <span data-path='%s'>%v</span></li></ul>", path+dir+"/", dir, path+dir+"/", subdirLen))
+			htmlStr = append(htmlStr, fmt.Sprintf("<ul  data-path='%s'><li data-path='%s' data-empty='false' ><span class='tree-expander' data-path='%s'>%v</span><span data-path='%s' class='tree-foldertext'>%s</span> </li></ul>", path+dir+"/", path+dir+"/", path+dir+"/", subdirLen, path+dir+"/", dir))
 		} else {
-			htmlStr = append(htmlStr, fmt.Sprintf("<ul data-path='%s'><li data-empty='true' >%s</li></ul>", path+dir+"/", dir))
+			htmlStr = append(htmlStr, fmt.Sprintf("<ul  data-path='%s'><li data-path='%s' data-empty='true' ></span><span data-path='%s' class='tree-foldertext'>%s</span></li></ul>", path+dir+"/", path+dir+"/", path+dir+"/", dir))
 		}
 	}
 	return htmlStr

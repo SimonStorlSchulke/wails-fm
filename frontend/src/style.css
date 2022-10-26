@@ -32,7 +32,7 @@ body {
     justify-content: normal;
     align-items: normal;
     align-content: normal;
-    height: calc(100vh - 30px);
+    height: calc(100vh - 36px);
 }
 
 
@@ -43,25 +43,48 @@ ul {
 
   li {
     display: block;
-    max-width: 150px;
     white-space: nowrap; 
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  li span {
+  li .tree-expander {
     color: rgba(255, 255, 255, 0.575);
-    background-color: rgb(58, 50, 7);
+    background-color: rgb(7, 49, 58);
     border-radius: 20%;
     min-width: 25px;
     text-align: center;
     height: 20px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    display: inline-table;
+    margin-right: 4px;
+  }
+
+  .tree-foldertext:hover {
+    color: white;
+    cursor: pointer;
+  }
+
+  .tree-foldertext {
+    display: inline-table;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px !important;
+
+  }
+   
+  li .tree-expander.expanded {
+    background-color: rgb(19, 89, 110);
+  }
+
+  li {
     display: inline-block;
   }
 
-  li span:hover {
+  li .tree-expander:hover {
+    cursor: pointer;
     color: rgba(0, 0, 0, 0.575);
-    background-color: rgb(190, 168, 40);
+    background-color: rgb(40, 175, 190);
   }
 
   .filetree {
@@ -88,6 +111,10 @@ ul {
   background: #5e69bd;
 }
 
+::-webkit-scrollbar-corner {
+  background-color: rgba(255, 0, 0, 0);
+}
+
 .file-area {
     display: block;
     flex-grow: 1;
@@ -101,7 +128,8 @@ ul {
     max-height: 100%;
     overflow-y: scroll;
     scrollbar-width: thin;
-    scrollbar-color: black white !important;
+    scrollbar-color: black rgb(203, 27, 27) !important;
+    scrollbar-arrow-color: black;
 }
 
 .inspector {
@@ -119,7 +147,8 @@ ul {
     align-self: auto;
     background-color: rgba(0, 0, 0, 0.356);
     order: 0;
-    min-width: 280px;
+    min-width: 290px;
+    width: 290px;
 }
 
 

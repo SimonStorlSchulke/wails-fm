@@ -1,8 +1,6 @@
 <script lang="ts">
     import { GetSubDirPaths } from "../wailsjs/go/main/App.js";
     import Tree from "./Tree.svelte"
-	export let tree
-	const {label, children} = tree
 
     let mounts: string[]
 
@@ -20,8 +18,8 @@
         {#if mounts}
         {#each mounts as mount}
         <div>
-            <input bind:group={selectedMount} type="radio" id="mount-{mount.substr(0, 1)}" name="a" value={mount.substr(0, 1)}>
-            <label for="mount-{mount.substr(0, 1)}" >{mount.substr(0, 1)}</label>
+            <input bind:group={selectedMount} type="radio" id="mount-{mount.substr(0, 1)}" name="a" value={mount.substring(0, 1)}>
+            <label for="mount-{mount.substring(0, 1)}" >{mount.substring(0, 1)}</label>
         </div>
         {/each}
         {/if}
