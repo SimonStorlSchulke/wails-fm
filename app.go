@@ -230,6 +230,7 @@ type Filestruct struct {
 	Extension string
 	MimeType  string
 	Hidden    bool
+	QID       string
 }
 
 type Folderstruct struct {
@@ -239,6 +240,7 @@ type Folderstruct struct {
 	ModDate  time.Time
 	Hidden   bool
 	IsLink   bool
+	QID      string
 }
 
 type FolderData struct {
@@ -266,6 +268,7 @@ type FileDetailsSingle struct {
 	ModifiedTime time.Time
 	AccessTime   time.Time
 	Owner        string
+	QID          string
 }
 
 func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
@@ -278,9 +281,6 @@ func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
 	fi, err := os.Lstat(path)
 	at, err := atime.Stat(path)
 	crTime, err := fileutil.CreatrionTimeFromPath(path)
-	if err != nil {
-
-	}
 
 	return FileDetailsSingle{
 		Name:         fi.Name(),
@@ -289,10 +289,14 @@ func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
 		CreationTime: crTime,
 		ModifiedTime: fi.ModTime(),
 		AccessTime:   at,
+		QID:          fileutil.QIDFromTime(crTime),
 	}
 }
 
 func (a *App) GetFolderAPI(path string) FolderData {
+	if path == "/" {
+		return FolderData{}
+	}
 	files, _ := ioutil.ReadDir(path)
 
 	var FileList []Filestruct
@@ -301,6 +305,7 @@ func (a *App) GetFolderAPI(path string) FolderData {
 		filename := file.Name()
 		hidden, _ := fileutil.FileIsHidden(path + "/" + filename)
 		fullPath := path + "/" + filename
+		isDir := file.IsDir()
 
 		//Check if file is Symlink
 		link, errIsLink := os.Readlink(path + "/" + filename)
@@ -309,11 +314,9 @@ func (a *App) GetFolderAPI(path string) FolderData {
 			fullPath = link
 		}
 
-		if filepath.Ext(filename) == ".lnk" {
+		crTime := fileutil.CreationTme(file)
 
-		}
-
-		if file.IsDir() || isLink {
+		if isDir || isLink {
 			FolderList = append(FolderList, Folderstruct{
 				FullPath: fullPath,
 				Name:     filename,
@@ -321,6 +324,7 @@ func (a *App) GetFolderAPI(path string) FolderData {
 				ModDate:  file.ModTime(),
 				Hidden:   hidden,
 				IsLink:   isLink,
+				QID:      fileutil.QIDFromTime(crTime),
 			})
 		} else {
 			FileList = append(FileList, Filestruct{
@@ -330,6 +334,7 @@ func (a *App) GetFolderAPI(path string) FolderData {
 				ModDate:   file.ModTime(),
 				Hidden:    hidden,
 				Extension: filepath.Ext(filename),
+				QID:       fileutil.QIDFromTime(crTime),
 			})
 		}
 	}

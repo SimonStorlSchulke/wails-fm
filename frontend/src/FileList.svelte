@@ -79,7 +79,7 @@
                 {#if folderData.Files}
                     {#each folderData.Files as fileInfo}
                         {#if !fileInfo.Hidden || showhiddenFiles}
-                            <FileVIew fileinfo={fileInfo} isDir={false} />
+                            <FileVIew fileinfo={fileInfo} isDir={false}/>
                         {/if}
                     {/each}
                 {/if}

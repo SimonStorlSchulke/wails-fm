@@ -117,7 +117,7 @@
     <div class="file-info">
     <p class="filename">{fileinfo.Name}</p>
     {#if !isDir}
-        <p class="filesize">{fileinfo.Size}</p>
+        <p class="filesize">{fileinfo.QID}</p>
     {/if}
     <p class="modified">{datestring}</p>
 </div>
