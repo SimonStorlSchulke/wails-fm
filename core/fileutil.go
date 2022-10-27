@@ -21,6 +21,7 @@ func CreatrionTimeFromPath(path string) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, err
 	}
+	fi.Sys()
 	return CreationTme(fi), nil
 }
 
@@ -41,6 +42,31 @@ func FileIsHidden(filename string) (bool, error) {
 		log.Fatal("Unable to invoke GetFileAttributes() function or FILE_ATTRIBUTE_HIDDEN property")
 	}
 	return false, nil
+}
+
+// FileQUI generates a more-or-less unique ID for each file based on its creation time.
+// This is orders of magnitude faster than checking the actual File ID, but may result in bugs when files have the exact same creation time
+func FileQUI(path string) string {
+	/*t, err := CreatrionTimeFromPath(path)
+	if err != nil {
+		return "invalid QID - cannot get creation Time"
+	}
+	return t.Format(time.RFC3339Nano)*/
+
+	info, _ := os.Stat("/path/to/the/file")
+
+	var UID int
+	var GID int
+	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+		UID = int(stat.Uid)
+		GID = int(stat.Gid)
+	}
+}
+
+// FileQUI generates a more-or-less unique ID for each file based on its creation time.
+// This is orders of magnitude faster than checking the actual File ID, but may result in bugs when files have the exact same creation time
+func QIDFromTime(t time.Time) string {
+	return t.Format(time.RFC3339Nano)
 }
 
 // IsText reports whether a significant prefix of s looks like correct UTF-8;
