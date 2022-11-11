@@ -58,6 +58,7 @@ ul {
     margin-bottom: 2px;
     display: inline-table;
     margin-right: 4px;
+    justify-content: center;
   }
 
   .tree-foldertext:hover {
@@ -115,23 +116,6 @@ ul {
   background-color: rgba(255, 0, 0, 0);
 }
 
-.file-area {
-    display: block;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: auto;
-    align-self: auto;
-    order: 0;
-    padding: 0px 2px 0px 15px;
-    margin-top: 20px;
-    text-align: left;
-    max-height: 100%;
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    scrollbar-color: black rgb(203, 27, 27) !important;
-    scrollbar-arrow-color: black;
-}
-
 .inspector {
     display: block;
     flex-basis: auto;
@@ -182,4 +166,27 @@ ul {
 
 .node-value {
     display: none !important;
+}
+
+.rm-menu {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  min-width: 150px;
+}
+
+.menu button {
+  min-width: 100%;
+  display: block;
+  background-color: rgb(51, 67, 87);
+  color: white;
+  border: none;
+  outline: 1px solid black;
+  text-align: left;
+  padding-left: 12px;
+  height: 27px;
+}
+
+.menu button:hover {
+  background-color: rgb(88, 117, 152);
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { selectedFilePaths } from "./AppState";
-    import { GetFileDetailsSingle } from "../wailsjs/go/main/App.js";
+    import { GetFileDetailsSingle, SetFileMeta, GetFileMeta } from "../wailsjs/go/main/App.js";
 
     let fileDetails;
     let selFilesNum = 1;
@@ -21,6 +21,17 @@
             fileDetails = "Nothing Selected";
         }
     });
+    let metaComment;
+    let metaColor;
+
+
+    function UpdateMeta(dom) {
+        GetFileMeta(fileDetails.QID).then( meta => {
+                metaComment = meta.Comment;
+                metaColor = meta.Color;
+            })
+    }
+
 </script>
 
 <div class="inspector">
@@ -35,7 +46,32 @@
                 <p>{fileDetails.MimeType}</p>
                 <p>{fileDetails.CreationTime}</p>
                 <p>Modified: {fileDetails.ModifiedTime}</p>
-                <p>ID: {fileDetails.QID}</p>
+                <table use:UpdateMeta>
+                    <tr>
+                      <td>
+                          <label for="filecolor">File Color</label>
+                        </td>
+                        <td>
+                            <input bind:value={metaColor} type="color" id="filecolor" name="filecolor"><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                          <label for="filecomment">Comment</label>
+                      </td>
+                      <td>
+                          <input bind:value={metaComment}  type="text" id="filecomment" name="filecomment" placeholder="enter file comment"><br>
+                      </td>
+                    </tr>
+                  </table>
+                
+                <button on:click={() => {
+                    SetFileMeta(fileDetails.QID, {
+                        Tags: [],
+                        Comment: metaComment,
+                        Color: metaColor
+                    })
+                    }}>Save</button>
             {/if}
         {/if}
     {/key}
@@ -47,6 +83,7 @@
         min-width: 300px;
         max-width: 300px;
     }
+
 
     h3 {
         word-wrap: break-word;

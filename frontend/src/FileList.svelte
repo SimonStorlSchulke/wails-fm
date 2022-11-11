@@ -58,7 +58,7 @@
 
 <div class="file-area">
     {#key folderData}
-        <section>
+        <section class="folders">
             {#if folderData}
                 {#if folderData.Folders}
                     {#each folderData.Folders as folderInfo}
@@ -74,7 +74,7 @@
             {/if}
         </section>
 
-        <section>
+        <section class="files">
             {#if folderData}
                 {#if folderData.Files}
                     {#each folderData.Files as fileInfo}
@@ -89,4 +89,24 @@
 </div>
 
 <style>
+    
+.file-area {
+    display: block;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto;
+    order: 0;
+    text-align: left;
+    max-height: 100%;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: black rgb(203, 27, 27) !important;
+    scrollbar-arrow-color: black;
+    font-size:0px;
+}
+
+.file-area .files {
+    margin-top: 10px;
+}
 </style>

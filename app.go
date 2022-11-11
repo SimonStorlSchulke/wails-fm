@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/base64"
 	b64 "encoding/base64"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -214,8 +215,20 @@ func imgIsSupported(extension string) bool {
 	}
 }
 
-func (a *App) OpenWithDefaultApp(path string) {
-	open.Run(path)
+func (a *App) OpenWithDefaultApp(path string) int {
+	err := open.Run(path)
+	if err != nil {
+		return 1
+	}
+	return 0
+}
+
+func (a *App) RenameFile(path string, newPath string) int {
+	err := os.Rename(path, newPath)
+	if err != nil {
+		return 1
+	}
+	return 0
 }
 
 func (a *App) FormatDate(date time.Time, format string) string {
@@ -289,7 +302,7 @@ func (a *App) GetFileDetailsSingle(path string) FileDetailsSingle {
 		CreationTime: crTime,
 		ModifiedTime: fi.ModTime(),
 		AccessTime:   at,
-		QID:          fileutil.QIDFromTime(crTime),
+		QID:          fileutil.QIDFromTime(crTime, fi.Name(), fi.IsDir()),
 	}
 }
 
@@ -324,7 +337,7 @@ func (a *App) GetFolderAPI(path string) FolderData {
 				ModDate:  file.ModTime(),
 				Hidden:   hidden,
 				IsLink:   isLink,
-				QID:      fileutil.QIDFromTime(crTime),
+				QID:      fileutil.QIDFromTime(crTime, filename, isDir),
 			})
 		} else {
 			FileList = append(FileList, Filestruct{
@@ -334,7 +347,7 @@ func (a *App) GetFolderAPI(path string) FolderData {
 				ModDate:   file.ModTime(),
 				Hidden:    hidden,
 				Extension: filepath.Ext(filename),
-				QID:       fileutil.QIDFromTime(crTime),
+				QID:       fileutil.QIDFromTime(crTime, filename, isDir),
 			})
 		}
 	}
@@ -347,13 +360,54 @@ func (a *App) GetThumbnailAsBase64(requestedFilename string) string {
 
 type Fs map[string]Fs
 
-type fol struct {
-	Name     string
-	FullPath string
-	childs   []fol
+type FileMeta struct {
+	Tags    []string
+	Comment string
+	Color   string
 }
 
-func RequestTreeExpand() {}
+func (a *App) GetFileMeta(qid string) FileMeta {
+	metaPath := fileutil.GenerateFileMetaPath(qid)
+
+	jsonFile, err := os.Open(metaPath)
+	if err != nil {
+		return FileMeta{}
+	}
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var metadata FileMeta
+	json.Unmarshal(byteValue, &metadata)
+	return metadata
+}
+
+func (a *App) SetFileMeta(qid string, meta FileMeta) {
+	metaPath := fileutil.GenerateFileMetaPath(qid)
+
+	// TODO create meta folder if it doesn't exist
+	f, err := os.Create(metaPath)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer f.Close()
+
+	/*meta := FileMeta{
+		[]string{"mytag"},
+		"My Comment about ü-Eier",
+		"#fff",
+	}*/
+
+	json, _ := json.Marshal(meta)
+
+	_, err2 := f.Write(json)
+
+	if err2 != nil {
+		fmt.Println(err2)
+	}
+}
 
 func GetSubDirPaths(path string) []string {
 	f, err := os.ReadDir(path)

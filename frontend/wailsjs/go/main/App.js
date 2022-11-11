@@ -10,6 +10,10 @@ export function GetFileDetailsSingle(arg1) {
   return window['go']['main']['App']['GetFileDetailsSingle'](arg1);
 }
 
+export function GetFileMeta(arg1) {
+  return window['go']['main']['App']['GetFileMeta'](arg1);
+}
+
 export function GetFolderAPI(arg1) {
   return window['go']['main']['App']['GetFolderAPI'](arg1);
 }
@@ -44,4 +48,12 @@ export function GetTreeHTML(arg1) {
 
 export function OpenWithDefaultApp(arg1) {
   return window['go']['main']['App']['OpenWithDefaultApp'](arg1);
+}
+
+export function RenameFile(arg1, arg2) {
+  return window['go']['main']['App']['RenameFile'](arg1, arg2);
+}
+
+export function SetFileMeta(arg1, arg2) {
+  return window['go']['main']['App']['SetFileMeta'](arg1, arg2);
 }
